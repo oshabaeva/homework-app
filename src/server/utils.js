@@ -1,5 +1,4 @@
 export const createTableData = (defaultState, ratesData)  => {
-  console.log(defaultState);
   let finUnits = defaultState.finUnits;
   let positions = defaultState.positions;
   let rates = ratesData.rates;
@@ -12,6 +11,7 @@ export const createTableData = (defaultState, ratesData)  => {
     let rate = rates[currency]
     let notionalValue = position.data.currency.notionalValue;
 
+    // table data elem
     let obj = {
       finUnitName : finUnit.name,
       notionalValue,
@@ -19,6 +19,8 @@ export const createTableData = (defaultState, ratesData)  => {
       currency,
       calculatedValue : notionalValue / rate
     }
+
+    // aggregate data elem
     if(!aggregatedData.some(item => item.name === obj.finUnitName)) {
       aggregatedData.push({
         name: obj.finUnitName,

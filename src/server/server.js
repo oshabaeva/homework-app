@@ -11,12 +11,12 @@ let app = express();
 app.listen(port, console.log("Server listening on port", port));
 
 app.get('/fetchTableData', (req,res) => {
-  axios.get('https://api.currencyfreaks.com/latest?apikey=2253ef43391c4500a8dc33373a5470fd')
-      .then((response) => {
-        const rates  = response.data;
-        let data = utils.createTableData(defaultState, rates);
-        res.send(data);
-      }).catch((error) => {
-        console.log(error);
-      });
-    })
+  axios.get('https://open.exchangerate-api.com/v6/latest')
+    .then((response) => {
+      const rates  = response.data;
+      let data = utils.createTableData(defaultState, rates);
+      res.send(data);
+    }).catch((error) => {
+      console.log(error);
+    });
+  })

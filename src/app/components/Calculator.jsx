@@ -1,78 +1,54 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { Select, Input, Label } from 'semantic-ui-react';
+import React, { useState } from 'react';
+import { Label } from 'semantic-ui-react';
 
-export class CalculatorImpl extends React.PureComponent {
+export const Calculator = ({rates}) => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedCur: "",
-      notValue: "",
-      calcResult: ""
-    }
-    this.onCurrencyChange = this.onCurrencyChange.bind(this);
-    this.onNotValueChange = this.onNotValueChange.bind(this);
-    this.calculate = this.calculate.bind(this);
+  const emptyCalcFields = {
+    selectedCur: "",
+    notValue: ""
   }
+  const [calcFields, setCalcFields] = useState(emptyCalcFields);
 
-  onCurrencyChange(value) {
-    this.setState({
-      selectedCur: value
-    }, function(){
-      this.calculate();
+  const onFieldChange = (event) => {
+    event.persist();
+    setCalcFields((curFields) => {
+      return {
+        ...curFields,
+        [event.target.name]: event.target.value,
+      }
     })
   }
 
-  onNotValueChange(value) {
-    this.setState({
-      notValue: value
-    })
-  }
-
-
-  getCurOptions(rates) {
-    let keys = Object.keys(rates);
-    let options = [];
-    keys.forEach((item, i) => {
-      options.push({key: item, value: item, text: item})
-    });
-    return options;
-  }
-
-  calculate() {
-    if(this.state.selectedCur && this.props.rates[this.state.selectedCur] && this.state.notValue) {
-      this.setState({
-        calcResult: parseInt(this.state.notValue) / parseFloat(this.props.rates[this.state.selectedCur])
-      })
+  const calculate = () => {
+    if(calcFields.selectedCur && rates[calcFields.selectedCur] && calcFields.notValue) {
+      return parseInt(calcFields.notValue) / parseFloat(rates[calcFields.selectedCur]);
+    } else {
+      return "";
     }
   }
-
-  render(){
-    const options = this.getCurOptions(this.props.rates);
-
-    return(
+  const calcResult = calculate();
+  return(
       <div>
+        <h2 style={{marginTop: "50px"}}>Currency exchange Calculator</h2>
         <div style={{display: "inline-block", marginRight:"20px"}}>
           <Label pointing="below" style={{display:"block"}}>Currency</Label>
-          <Select placeholder='Select currency' options={options} onChange={(e, data)=> this.onCurrencyChange(data.value)}/>
+          <select style={{border:"solid 1px lightGrey", width: "200px", borderRadius: "4px", height: "28px"}} name="selectedCur" placeholder='Select currency' value={calcFields.selectedCur} onChange={onFieldChange}>
+              <option key="-1" value="" disabled>Select currency</option>
+            {Object.keys(rates).map((item) => (
+              <option key={item} value={item}>{item}</option>
+            )
+          )}
+          </select>
         </div>
         <div style={{display:"inline-block", marginRight:"20px"}}>
           <Label pointing="below" style={{display:"block"}}>Notional Value</Label>
-          <Input value={this.state.notValue} onChange={(e,data) => this.onNotValueChange(data.value)} onBlur={(e) => this.calculate()} />
+          <input placeholder="Fill notional value" style={{border:"solid 1px lightGrey", width: "200px", borderRadius: "4px", height: "28px"}} name="notValue" value={calcFields.notValue} onChange={onFieldChange} /*onBlur={calculate}*/ type="number"/>
         </div>
         <div style={{display:"inline-block"}}>
           <Label pointing="below" style={{display:"block"}}>Calculated Value (in USD)</Label>
-          <Input value={this.state.calcResult} readOnly />
+          <input style={{border:"solid 1px lightGrey", width: "200px", borderRadius: "4px", height: "28px"}} value={calcResult} readOnly />
         </div>
       </div>
     )
-  }
-}
 
-function mapStateToProps(state) {
-  return {
-    rates: state.rates ? state.rates : null
-  }
 }
-export const Calculator = connect(mapStateToProps)(CalculatorImpl);
